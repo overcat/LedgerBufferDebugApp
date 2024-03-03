@@ -15,7 +15,9 @@ import {
   Text,
   useColorScheme,
   View,
+  Button,
 } from 'react-native';
+import {Buffer} from 'buffer';
 
 import {
   Colors,
@@ -62,6 +64,36 @@ function App(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+  const myTest = () => {
+    console.log('Test 1');
+    function TestBuffer(...args) {
+      console.log(args);
+      const buf = new Uint8Array(...args);
+      Object.setPrototypeOf(buf, TestBuffer.prototype);
+      return buf;
+    }
+    Object.setPrototypeOf(TestBuffer.prototype, Uint8Array.prototype);
+    Object.setPrototypeOf(TestBuffer, Uint8Array);
+    console.log(TestBuffer(1).subarray(0, 1) instanceof TestBuffer);
+
+    console.log('Test 2');
+    const buf = Buffer.alloc(10);
+    const subarray = buf.subarray(0, 5);
+    console.log(subarray instanceof Buffer);
+    console.log(Buffer.isBuffer(subarray));
+    console.log(subarray.toString('base64'));
+
+    console.log('Test 3');
+    const buf2 = Buffer.alloc(10);
+    function functionThatCallsSubarray(buf) {
+      console.log(buf instanceof Buffer);
+      const res = buf.subarray(0, 2);
+      console.log(res instanceof Buffer);
+      return res;
+    }
+    functionThatCallsSubarray(buf2);
+  };
+
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
@@ -76,6 +108,14 @@ function App(): React.JSX.Element {
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
           }}>
+          <Section title="Run Buffer Test">
+            <Button
+              title="Click Me and check console for logs"
+              color="#000000"
+              onPress={myTest}
+            />
+            {/* 'Run Buffer Test' */}
+          </Section>
           <Section title="Step One">
             Edit <Text style={styles.highlight}>App.tsx</Text> to change this
             screen and then come back to see your edits.
